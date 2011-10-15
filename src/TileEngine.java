@@ -26,7 +26,7 @@ public class TileEngine extends BasicGame {
 	public void init(GameContainer container) throws SlickException {
 		container.setVSync(true);
 		// Hide the mouse
-		container.setMouseGrabbed(true);
+		//container.setMouseGrabbed(true);
 		map = new TiledMap("resources/demo_map1.tmx");
 		// TODO: Use animations and spritesheets
 		player = new Image("resources/player.png");
