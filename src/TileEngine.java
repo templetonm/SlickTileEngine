@@ -34,7 +34,7 @@ public class TileEngine extends BasicGame {
 		c.setVSync(true);
 		// Hide the mouse
 		//container.setMouseGrabbed(true);
-		map = new TiledMap("resources/demo_map.tmx");
+		map = new TiledMap("resources/demo_map1.tmx");
 		// TODO: Use animations and spritesheets
 		player = new Image("resources/player.png");
 		offX = WIDTH/2 - player.getWidth()/2 - playerX * player.getWidth();
