@@ -5,22 +5,22 @@
  </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
  <tileset firstgid="153" source="atts.tsx"/>
- <layer name="ground" width="25" height="20">
+ <layer name="Ground" width="25" height="20">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+NgYGDgGMWjeBSP4lE8ikfxkMYAHI1v7NAHAAA=
   </data>
  </layer>
- <layer name="bg" width="25" height="20">
+ <layer name="Background" width="25" height="20">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC8WVMQrAIAxFHXoAZ3Hq0vvfsAgGSsg3fhvbB1lEfUkgWlJK5cc4yTh66PXR/SxXDw3KW6iBjpW8hew4dN7Z2NOYqefpYOpnQHXscqB+NFCNozOWIwIrl697xRAxH1FU4CjBHuQQz5uZQXOu30Dv/AyrDgbPwXpm5iPyL7McO/7MkeMGjk8gYdAHAAA=
   </data>
  </layer>
- <layer name="fg" width="25" height="20">
+ <layer name="Foreground" width="25" height="20">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC2NgGAWjYBSMglEwCkbBUAcARPTJAtAHAAA=
   </data>
  </layer>
- <layer name="atts" width="25" height="20">
+ <layer name="Attribute" width="25" height="20">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC5vJwMAwcwhhGCBHD6WA1uaj20ErQGvzR8EoGKqAHvmCXvmblvYMhB20sIcWdROtzMdlD7IcADowLY/QBwAA
   </data>

@@ -9,25 +9,31 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 
 public class TileEngine extends BasicGame {
+	// Engine constants
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
+	private static final boolean FULLSCREEN = false;
+	private static final int PLAYER_SPEED = 6;
+	// Tiled constants
 	private static final int GROUND_LAYER = 0;
 	private static final int BG_LAYER = 1;
 	private static final int FG_LAYER = 2;
-	private static final int PLAYERPOSITIONOFFYUP = 200;
-	private static final int PLAYERPOSITIONOFFYDOWN = 400;
-	private static final int PLAYERPOSITIONOFFXLEFT = 200;
-	private static final int PLAYERPOSITIONOFFXRIGHT = 600;
-	// Player speed
-	private static final int SPEED = 6;
+	private static final int ATTRIBUTE_LAYER = 3;
+	// Sliding constants
+	private static final int SLIDINGPOSITIONOFFYUP = 200;
+	private static final int SLIDINGPOSITIONOFFYDOWN = 400;
+	private static final int SLIDINGPOSITIONOFFXLEFT = 200;
+	private static final int SLIDINGPOSITIONOFFXRIGHT = 600;
+	// Member variables
+	private int slidingPositionX;
+	private int slidingPositionY;
 	private TiledMap map;
 	private Image player;
-	private int playerX = 5;
-	private int playerY = 5;
+	private int playerX;
+	private int playerY;
 	private int offX;
 	private int offY;
 	private String mapName;
-	private int [] playerPosition = null;
 	
 	public TileEngine() {
 		super("TileEngine");
@@ -37,57 +43,127 @@ public class TileEngine extends BasicGame {
 	public void init(GameContainer c) throws SlickException {
 		c.setVSync(true);
 		// Hide the mouse
-		//container.setMouseGrabbed(true);
+		if (FULLSCREEN) c.setMouseGrabbed(true);
 		map = new TiledMap("resources/demo_map.tmx");
 		// TODO: Use animations and spritesheets
 		player = new Image("resources/player.png");
-		// Start the player off at 5,5
-		offX = WIDTH/2 - player.getWidth()/2 - playerX * player.getWidth();
-		offY = HEIGHT/2 - player.getHeight()/2 - playerY * player.getHeight();
+		// Start the player off at 5, 5
+		playerX = 5 * player.getWidth();
+		playerY = 5 * player.getHeight();
+		offX = WIDTH/2 - player.getWidth()/2 - playerX;
+		offY = HEIGHT/2 - player.getHeight()/2 - playerY;
 		mapName = map.getMapProperty("Name", "");
-		// Initial position is center of screen.
-		playerPosition = new int[] {WIDTH/2-player.getWidth()/2, HEIGHT/2-player.getHeight()/2};
+		// Initial position is center of screen
+		slidingPositionX = WIDTH/2-player.getWidth()/2;
+		slidingPositionY = HEIGHT/2-player.getHeight()/2;
+	}
+	
+	private int getTileX(int x) {
+		return (int)Math.round((float)x / (float)player.getWidth());
+	}
+	
+	private int getTileY(int y) {
+		return (int)Math.round((float)y / (float)player.getHeight());
+	}
+	
+	private boolean isBlocked(int tileX, int tileY) {
+		boolean blocked = false;
+		int tileId = map.getTileId(tileX, tileY, ATTRIBUTE_LAYER);
+		if (map.getTileProperty(tileId, "Wall", "false").equals("true")) {
+			blocked = true;
+		}
+		return blocked;
+	}
+	
+	private boolean blocked(int x, int y) {
+		boolean blocked = false;
+		// Bounds checking
+		if (x < 0) return true;
+		if (x > map.getWidth() * player.getWidth() - player.getWidth()) return true;
+		if (y < 0) return true;
+		if (y > map.getHeight() * player.getHeight() - player.getHeight()) return true;
+		
+		// WALL checking
+		// Bottom left
+		if (isBlocked(getTileX(x - player.getWidth() / 2),getTileY(y + player.getHeight()/2))) {
+			blocked = true;
+		}
+		// Bottom right
+		if (isBlocked(getTileX(x + player.getWidth()/2), getTileY(y + player.getHeight()/2))) {
+			blocked = true;
+		}
+		// Top left
+		if (isBlocked(getTileX(x - player.getWidth()/2), getTileY(y - player.getHeight()/2))) {
+			blocked = true;
+		}
+		// Top right
+		if (isBlocked(getTileX(x + player.getWidth()/2), getTileY(y - player.getHeight()/2))) {
+			blocked = true;
+		}
+		return blocked;
 	}
 
 	@Override
-	public void update(GameContainer container, int delta) throws SlickException {
-		if (container.getInput().isKeyDown(Input.KEY_UP)) {
-			if (playerPosition[1] < PLAYERPOSITIONOFFYUP) {
-				offY += SPEED;
+	public void update(GameContainer c, int delta) throws SlickException {
+		int tempPlayerX = playerX;
+		int tempPlayerY = playerY;
+		int tempOffX = offX;
+		int tempOffY = offY;
+		int tempSlidingPositionX = slidingPositionX;
+		int tempSlidingPositionY = slidingPositionY;
+		
+		// The && in these are bound checking blocks..
+		if (c.getInput().isKeyDown(Input.KEY_UP)) {
+			if (slidingPositionY < SLIDINGPOSITIONOFFYUP) {
+				tempOffY += PLAYER_SPEED;
+			} else {
+				tempSlidingPositionY -= PLAYER_SPEED;
 			}
-			else {
-				playerPosition[1] -= SPEED;
+			tempPlayerY -= PLAYER_SPEED;
+		} else if (c.getInput().isKeyDown(Input.KEY_DOWN)) {
+			if (slidingPositionY > SLIDINGPOSITIONOFFYDOWN) {
+				tempOffY -= PLAYER_SPEED;
+			} else {
+				tempSlidingPositionY += PLAYER_SPEED;
 			}
+			tempPlayerY += PLAYER_SPEED;
 		}
 		
-		if (container.getInput().isKeyDown(Input.KEY_DOWN)) {
-			if (playerPosition[1] > PLAYERPOSITIONOFFYDOWN) {
-				offY -= SPEED;
+		if (c.getInput().isKeyDown(Input.KEY_LEFT )) {
+			if (slidingPositionX < SLIDINGPOSITIONOFFXLEFT) {
+				tempOffX += PLAYER_SPEED;
+			} else {
+				tempSlidingPositionX -= PLAYER_SPEED;
 			}
-			else {
-				playerPosition[1] += SPEED;
+			tempPlayerX -= PLAYER_SPEED;
+		} else if (c.getInput().isKeyDown(Input.KEY_RIGHT)) {
+			if (slidingPositionX > SLIDINGPOSITIONOFFXRIGHT) {
+				tempOffX -= PLAYER_SPEED;
+			} else {
+				tempSlidingPositionX += PLAYER_SPEED;
 			}
+			tempPlayerX += PLAYER_SPEED;
 		}
 		
-		if (container.getInput().isKeyDown(Input.KEY_LEFT)) {
-			if (playerPosition[0] < PLAYERPOSITIONOFFXLEFT) {
-				offX += SPEED;
-			}
-			else {
-				playerPosition[0] -= SPEED;
-			}
+		// TODO make this function the same and not look like shit
+		if (!blocked(tempPlayerX, tempPlayerY)) {
+			playerX = tempPlayerX;
+			offX = tempOffX;
+			slidingPositionX = tempSlidingPositionX;
+			playerY = tempPlayerY;
+			offY = tempOffY;
+			slidingPositionY = tempSlidingPositionY;
+		} else if (!blocked(playerX, tempPlayerY)) {
+			playerY = tempPlayerY;
+			offY = tempOffY;
+			slidingPositionY = tempSlidingPositionY;
+		} else if (!blocked(tempPlayerX, playerY)) {
+			playerX = tempPlayerX;
+			offX = tempOffX;
+			slidingPositionX = tempSlidingPositionX;
 		}
 		
-		if (container.getInput().isKeyDown(Input.KEY_RIGHT)) {
-			if (playerPosition[0] > PLAYERPOSITIONOFFXRIGHT) {
-				offX -= SPEED;
-			}
-			else {
-				playerPosition[0] += SPEED;
-			}
-		}
-		
-		if (container.getInput().isKeyDown(Input.KEY_ESCAPE)) { container.exit(); }
+		if (c.getInput().isKeyDown(Input.KEY_ESCAPE)) { c.exit(); }
 	}
 
 	@Override
@@ -95,7 +171,7 @@ public class TileEngine extends BasicGame {
 		// TODO: Only render necessary tiles
 		map.render(offX, offY, GROUND_LAYER);
 		map.render(offX, offY, BG_LAYER);
-		player.draw(playerPosition[0],playerPosition[1]);
+		player.draw(slidingPositionX, slidingPositionY);
 		map.render(offX, offY, FG_LAYER);
 		
 		// Draw map name
@@ -105,16 +181,17 @@ public class TileEngine extends BasicGame {
 		
 		// Draw player coordinates
 		g.setColor(Color.yellow);
-		String coords = "(" + playerX + "," + playerY + ")";
+		int playerTileX = getTileX(playerX);
+		int playerTileY = getTileY(playerY);
+		String coords = "(" + playerTileX + "," + playerTileY + ")";
 		lineWidth = c.getDefaultFont().getWidth(coords);
 		g.drawString(coords, WIDTH - lineWidth - 5, 0);
-		
 	}
 	
 	public static void main(String[] args) 
 			throws SlickException {
 		AppGameContainer app = new AppGameContainer(new TileEngine());
-	    app.setDisplayMode(WIDTH, HEIGHT, false);
+	    app.setDisplayMode(WIDTH, HEIGHT, FULLSCREEN);
 	    app.start();
 	}
 
