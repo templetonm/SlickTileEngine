@@ -14,6 +14,10 @@ public class TileEngine extends BasicGame {
 	private static final int GROUND_LAYER = 0;
 	private static final int BG_LAYER = 1;
 	private static final int FG_LAYER = 2;
+	private static final int PLAYERPOSITIONOFFYUP = 200;
+	private static final int PLAYERPOSITIONOFFYDOWN = 400;
+	private static final int PLAYERPOSITIONOFFXLEFT = 200;
+	private static final int PLAYERPOSITIONOFFXRIGHT = 600;
 	// Player speed
 	private static final int SPEED = 6;
 	private TiledMap map;
@@ -23,7 +27,7 @@ public class TileEngine extends BasicGame {
 	private int offX;
 	private int offY;
 	private String mapName;
-
+	private int [] playerPosition = null;
 	
 	public TileEngine() {
 		super("TileEngine");
@@ -34,25 +38,56 @@ public class TileEngine extends BasicGame {
 		c.setVSync(true);
 		// Hide the mouse
 		//container.setMouseGrabbed(true);
-		map = new TiledMap("resources/demo_map1.tmx");
+		map = new TiledMap("resources/demo_map.tmx");
 		// TODO: Use animations and spritesheets
 		player = new Image("resources/player.png");
+		// Start the player off at 5,5
 		offX = WIDTH/2 - player.getWidth()/2 - playerX * player.getWidth();
 		offY = HEIGHT/2 - player.getHeight()/2 - playerY * player.getHeight();
 		mapName = map.getMapProperty("Name", "");
+		// Initial position is center of screen.
+		playerPosition = new int[] {WIDTH/2-player.getWidth()/2, HEIGHT/2-player.getHeight()/2};
 	}
 
 	@Override
-	public void update(GameContainer c, int delta) throws SlickException {
-
-		if (c.getInput().isKeyDown(Input.KEY_UP)) { offY += SPEED; }
-		if (c.getInput().isKeyDown(Input.KEY_DOWN)) { offY -= SPEED; }
-		if (c.getInput().isKeyDown(Input.KEY_LEFT)) { offX += SPEED; }
-		if (c.getInput().isKeyDown(Input.KEY_RIGHT)) { offX -= SPEED; }
-		if (c.getInput().isKeyDown(Input.KEY_ESCAPE)) { c.exit(); }
+	public void update(GameContainer container, int delta) throws SlickException {
+		if (container.getInput().isKeyDown(Input.KEY_UP)) {
+			if (playerPosition[1] < PLAYERPOSITIONOFFYUP) {
+				offY += SPEED;
+			}
+			else {
+				playerPosition[1] -= SPEED;
+			}
+		}
 		
-		playerX = (offX - WIDTH/2 + player.getWidth()/2) / player.getWidth() * - 1;
-		playerY = (offY - HEIGHT/2 + player.getHeight()/2) / player.getHeight() * - 1;
+		if (container.getInput().isKeyDown(Input.KEY_DOWN)) {
+			if (playerPosition[1] > PLAYERPOSITIONOFFYDOWN) {
+				offY -= SPEED;
+			}
+			else {
+				playerPosition[1] += SPEED;
+			}
+		}
+		
+		if (container.getInput().isKeyDown(Input.KEY_LEFT)) {
+			if (playerPosition[0] < PLAYERPOSITIONOFFXLEFT) {
+				offX += SPEED;
+			}
+			else {
+				playerPosition[0] -= SPEED;
+			}
+		}
+		
+		if (container.getInput().isKeyDown(Input.KEY_RIGHT)) {
+			if (playerPosition[0] > PLAYERPOSITIONOFFXRIGHT) {
+				offX -= SPEED;
+			}
+			else {
+				playerPosition[0] += SPEED;
+			}
+		}
+		
+		if (container.getInput().isKeyDown(Input.KEY_ESCAPE)) { container.exit(); }
 	}
 
 	@Override
@@ -60,8 +95,7 @@ public class TileEngine extends BasicGame {
 		// TODO: Only render necessary tiles
 		map.render(offX, offY, GROUND_LAYER);
 		map.render(offX, offY, BG_LAYER);
-		// Draw the player in the center of the screen		
-		player.draw(WIDTH/2-player.getWidth()/2,HEIGHT/2-player.getHeight()/2);
+		player.draw(playerPosition[0],playerPosition[1]);
 		map.render(offX, offY, FG_LAYER);
 		
 		// Draw map name
@@ -74,6 +108,7 @@ public class TileEngine extends BasicGame {
 		String coords = "(" + playerX + "," + playerY + ")";
 		lineWidth = c.getDefaultFont().getWidth(coords);
 		g.drawString(coords, WIDTH - lineWidth - 5, 0);
+		
 	}
 	
 	public static void main(String[] args) 
