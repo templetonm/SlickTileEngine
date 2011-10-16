@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="25" height="20" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="Name" value="My Mine"/>
+ </properties>
  <tileset firstgid="1" source="tileset.tsx"/>
  <tileset firstgid="153" source="atts.tsx"/>
  <layer name="ground" width="25" height="20">
@@ -7,7 +10,7 @@
    H4sIAAAAAAAAC+NgYGDgGMWjeBSP4lE8ikfxkMYAHI1v7NAHAAA=
   </data>
  </layer>
- <layer name="bg" width="25" height="20" visible="0">
+ <layer name="bg" width="25" height="20">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC8WVMQrAIAxFHXoAZ3Hq0vvfsAgGSsg3fhvbB1lEfUkgWlJK5cc4yTh66PXR/SxXDw3KW6iBjpW8hew4dN7Z2NOYqefpYOpnQHXscqB+NFCNozOWIwIrl697xRAxH1FU4CjBHuQQz5uZQXOu30Dv/AyrDgbPwXpm5iPyL7McO/7MkeMGjk8gYdAHAAA=
   </data>
