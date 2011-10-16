@@ -112,7 +112,6 @@ public class TileEngine extends BasicGame {
 		int tempSlidingPositionX = slidingPositionX;
 		int tempSlidingPositionY = slidingPositionY;
 		
-		// The && in these are bound checking blocks..
 		if (c.getInput().isKeyDown(Input.KEY_UP)) {
 			if (slidingPositionY < SLIDINGPOSITIONOFFYUP) {
 				tempOffY += PLAYER_SPEED;
