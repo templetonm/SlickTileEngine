@@ -1,3 +1,4 @@
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -6,6 +7,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.tiled.TiledMap;
 
 public class TileEngine extends BasicGame {
@@ -28,12 +30,13 @@ public class TileEngine extends BasicGame {
 	private int slidingPositionX;
 	private int slidingPositionY;
 	private TiledMap map;
-	private Image player;
+	private Animation player;
 	private int playerX;
 	private int playerY;
 	private int offX;
 	private int offY;
 	private String mapName;
+	private SpriteSheet sheet;
 	
 	public TileEngine() {
 		super("TileEngine");
@@ -45,8 +48,16 @@ public class TileEngine extends BasicGame {
 		// Hide the mouse
 		if (FULLSCREEN) c.setMouseGrabbed(true);
 		map = new TiledMap("resources/demo_map.tmx");
-		// TODO: Use animations and spritesheets
-		player = new Image("resources/player.png");
+		// Setup the player animation
+		sheet = new SpriteSheet(new Image("resources/spritesheet.png"),32, 32);
+		player = new Animation(true);
+		for (int dir=0;dir<4; dir++) {
+			for (int frame=0;frame<2;frame++) {
+				player.addFrame(sheet.getSprite(frame,dir), 100);
+			}
+		}
+		player.stop();
+		
 		// Start the player off at 5, 5
 		playerX = 5 * player.getWidth();
 		playerY = 5 * player.getHeight();
@@ -119,6 +130,12 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionY -= PLAYER_SPEED;
 			}
 			tempPlayerY -= PLAYER_SPEED;
+			if (player.isStopped()) {
+				player.setCurrentFrame(6);
+				player.stopAt(7);
+				player.start();
+			}
+			
 		} else if (c.getInput().isKeyDown(Input.KEY_DOWN)) {
 			if (slidingPositionY > SLIDINGPOSITIONOFFYDOWN) {
 				tempOffY -= PLAYER_SPEED;
@@ -126,6 +143,11 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionY += PLAYER_SPEED;
 			}
 			tempPlayerY += PLAYER_SPEED;
+			if (player.isStopped()) {
+				player.setCurrentFrame(0);
+				player.stopAt(1);
+				player.start();
+			}
 		}
 		
 		if (c.getInput().isKeyDown(Input.KEY_LEFT )) {
@@ -135,6 +157,12 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionX -= PLAYER_SPEED;
 			}
 			tempPlayerX -= PLAYER_SPEED;
+			if (player.isStopped()) {
+				player.setCurrentFrame(2);
+				player.stopAt(3);
+				player.start();
+			}
+			
 		} else if (c.getInput().isKeyDown(Input.KEY_RIGHT)) {
 			if (slidingPositionX > SLIDINGPOSITIONOFFXRIGHT) {
 				tempOffX -= PLAYER_SPEED;
@@ -142,6 +170,11 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionX += PLAYER_SPEED;
 			}
 			tempPlayerX += PLAYER_SPEED;
+			if (player.isStopped()) {
+				player.setCurrentFrame(4);
+				player.stopAt(5);
+				player.start();
+			}
 		}
 		
 		// TODO make this function the same and not look like shit
