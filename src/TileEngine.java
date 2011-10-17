@@ -51,10 +51,8 @@ public class TileEngine extends BasicGame {
 		// Setup the player animation
 		sheet = new SpriteSheet(new Image("resources/spritesheet.png"),32, 32);
 		player = new Animation(true);
-		for (int dir=0;dir<4; dir++) {
-			for (int frame=0;frame<2;frame++) {
-				player.addFrame(sheet.getSprite(frame,dir), 100);
-			}
+		for (int frame=0;frame<17;frame++) {
+			player.addFrame(sheet.getSprite(frame,0), 100);
 		}
 		player.stop();
 		
@@ -123,6 +121,7 @@ public class TileEngine extends BasicGame {
 		int tempSlidingPositionX = slidingPositionX;
 		int tempSlidingPositionY = slidingPositionY;
 		
+		
 		if (c.getInput().isKeyDown(Input.KEY_UP)) {
 			if (slidingPositionY < SLIDINGPOSITIONOFFYUP) {
 				tempOffY += PLAYER_SPEED;
@@ -130,9 +129,9 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionY -= PLAYER_SPEED;
 			}
 			tempPlayerY -= PLAYER_SPEED;
-			if (player.isStopped()) {
-				player.setCurrentFrame(6);
-				player.stopAt(7);
+			if (player.isStopped() || (player.getFrame() != 1 && player.getFrame() != 2)) {
+				player.setCurrentFrame(1);
+				player.stopAt(2);
 				player.start();
 			}
 			
@@ -143,9 +142,9 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionY += PLAYER_SPEED;
 			}
 			tempPlayerY += PLAYER_SPEED;
-			if (player.isStopped()) {
-				player.setCurrentFrame(0);
-				player.stopAt(1);
+			if (player.isStopped() || (player.getFrame() != 5 && player.getFrame() != 6)) {
+				player.setCurrentFrame(5);
+				player.stopAt(6);
 				player.start();
 			}
 		}
@@ -157,10 +156,12 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionX -= PLAYER_SPEED;
 			}
 			tempPlayerX -= PLAYER_SPEED;
-			if (player.isStopped()) {
-				player.setCurrentFrame(2);
-				player.stopAt(3);
-				player.start();
+			if (!c.getInput().isKeyDown(Input.KEY_DOWN) && !c.getInput().isKeyDown(Input.KEY_UP)) {
+				if (player.isStopped() || (player.getFrame() != 8 && player.getFrame() != 9)) {
+					player.setCurrentFrame(8);
+					player.stopAt(9);
+					player.start();
+				}
 			}
 			
 		} else if (c.getInput().isKeyDown(Input.KEY_RIGHT)) {
@@ -170,10 +171,12 @@ public class TileEngine extends BasicGame {
 				tempSlidingPositionX += PLAYER_SPEED;
 			}
 			tempPlayerX += PLAYER_SPEED;
-			if (player.isStopped()) {
-				player.setCurrentFrame(4);
-				player.stopAt(5);
-				player.start();
+			if (!c.getInput().isKeyDown(Input.KEY_DOWN) && !c.getInput().isKeyDown(Input.KEY_UP)) {
+				if (player.isStopped() || (player.getFrame() != 12 && player.getFrame() != 13)) {
+					player.setCurrentFrame(12);
+					player.stopAt(13);
+					player.start();
+				}
 			}
 		}
 		
