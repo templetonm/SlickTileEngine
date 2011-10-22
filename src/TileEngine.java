@@ -1,22 +1,75 @@
+import java.awt.Dimension;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
-import org.newdawn.slick.tiled.TiledMap;
 
 public class TileEngine extends BasicGame {
 	// Engine constants
-	private static final int WIDTH = 800;
-	private static final int HEIGHT = 600;
-	private static final boolean FULLSCREEN = false;
 	private static final int PLAYER_SPEED = 6;
+	private static final Dimension SCREEN = new Dimension(800,600);
+	private static final boolean FULLSCREEN = false;
 	// Tiled constants
+
+	Entity player;
+	Entity map;
+	MapRenderComponent mapRender;
+	Animation playerAnim;
+	
+	public TileEngine() {
+		super("TileEngine");
+	}
+
+	@Override
+	public void init(GameContainer arg0) throws SlickException {
+		Image sheetImage = new Image("resources/spritesheet.png");
+		SpriteSheet sheet = new SpriteSheet(sheetImage, 32, 32);
+		player = new Entity("Player");
+		map = new Entity("Map");
+		
+		playerAnim = new Animation(true);
+		for (int frame=0; frame<17; frame++) {
+			playerAnim.addFrame(sheet.getSprite(frame, 0), 150);
+		}
+		// PlayerSlidingComponent?
+		player.addComponent(new PlayerAnimComponent("PlayerAnim", playerAnim));
+		PlayerRenderComponent playerRender;
+		playerRender = new PlayerRenderComponent("PlayerRender", playerAnim, SCREEN);
+		player.addComponent(playerRender);
+		mapRender = new MapRenderComponent("MapRender", playerRender);
+		map.addComponent(mapRender);
+	}
+
+	@Override
+	public void update(GameContainer gc, int delta) throws SlickException {
+		player.update(gc, null, delta);
+		mapRender.update(gc, null, delta);
+	}
+
+	@Override
+	public void render(GameContainer gc, Graphics g) throws SlickException {
+		try {
+			mapRender.renderBackground(gc, null, g);
+			player.render(gc, null, g);
+			mapRender.renderForeground(gc, null, g);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) throws SlickException {
+		AppGameContainer app = new AppGameContainer(new TileEngine());
+		app.setDisplayMode(SCREEN.width, SCREEN.height, FULLSCREEN);
+		app.start();
+	}
+	
+	
+/*
 	private static final int GROUND_LAYER = 0;
 	private static final int BG_LAYER = 1;
 	private static final int FG_LAYER = 2;
@@ -37,11 +90,6 @@ public class TileEngine extends BasicGame {
 	private int offY;
 	private String mapName;
 	private SpriteSheet sheet;
-	
-	public TileEngine() {
-		super("TileEngine");
-	}
-
 	@Override
 	public void init(GameContainer c) throws SlickException {
 		c.setVSync(true);
@@ -52,7 +100,7 @@ public class TileEngine extends BasicGame {
 		sheet = new SpriteSheet(new Image("resources/spritesheet.png"),32, 32);
 		player = new Animation(true);
 		for (int frame=0;frame<17;frame++) {
-			player.addFrame(sheet.getSprite(frame,0), 100);
+			player.addFrame(sheet.getSprite(frame,0), 150);
 		}
 		player.stop();
 		
@@ -120,8 +168,7 @@ public class TileEngine extends BasicGame {
 		int tempOffY = offY;
 		int tempSlidingPositionX = slidingPositionX;
 		int tempSlidingPositionY = slidingPositionY;
-		
-		
+				
 		if (c.getInput().isKeyDown(Input.KEY_UP)) {
 			if (slidingPositionY < SLIDINGPOSITIONOFFYUP) {
 				tempOffY += PLAYER_SPEED;
@@ -228,6 +275,6 @@ public class TileEngine extends BasicGame {
 		AppGameContainer app = new AppGameContainer(new TileEngine());
 	    app.setDisplayMode(WIDTH, HEIGHT, FULLSCREEN);
 	    app.start();
-	}
+	}*/
 
 }
