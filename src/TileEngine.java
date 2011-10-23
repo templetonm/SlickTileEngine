@@ -26,7 +26,8 @@ public class TileEngine extends BasicGame {
 	}
 
 	@Override
-	public void init(GameContainer arg0) throws SlickException {
+	public void init(GameContainer c) throws SlickException {
+		c.setVSync(true);
 		Image sheetImage = new Image("resources/spritesheet.png");
 		SpriteSheet sheet = new SpriteSheet(sheetImage, 32, 32);
 		player = new Entity("Player");
