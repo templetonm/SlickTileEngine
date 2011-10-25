@@ -8,18 +8,21 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.tiled.TiledMap;
 
 public class TileEngine extends BasicGame {
 	// Engine constants
 	private static final int PLAYER_SPEED = 6;
 	private static final Dimension SCREEN = new Dimension(800,600);
 	private static final boolean FULLSCREEN = false;
-	// Tiled constants
-
+	
 	Entity player;
 	Entity map;
 	MapRenderComponent mapRender;
 	Animation playerAnim;
+	SlidingComponent slidingComp;
 	
 	public TileEngine() {
 		super("TileEngine");
@@ -27,29 +30,51 @@ public class TileEngine extends BasicGame {
 
 	@Override
 	public void init(GameContainer c) throws SlickException {
+		// Cap FPS
 		c.setVSync(true);
+		
+		// Load in resources
 		Image sheetImage = new Image("resources/spritesheet.png");
 		SpriteSheet sheet = new SpriteSheet(sheetImage, 32, 32);
+		TiledMap tiledMap = new TiledMap("resources/demo_map.tmx");
+		
+		// Setup entities
 		player = new Entity("Player");
 		map = new Entity("Map");
 		
+		// Setup the animation component
 		playerAnim = new Animation(true);
 		for (int frame=0; frame<17; frame++) {
 			playerAnim.addFrame(sheet.getSprite(frame, 0), 150);
 		}
-		// PlayerSlidingComponent?
 		player.addComponent(new PlayerAnimComponent("PlayerAnim", playerAnim));
 		PlayerRenderComponent playerRender;
-		playerRender = new PlayerRenderComponent("PlayerRender", playerAnim, SCREEN);
-		player.addComponent(playerRender);
-		mapRender = new MapRenderComponent("MapRender", playerRender);
+		
+		
+		// Setup the sliding component
+		// TODO: We can get rid of the initial slidingPos
+		Vector2f slidingPos = new Vector2f();
+	    slidingPos.x = SCREEN.width/2 - playerAnim.getWidth()/2;
+		slidingPos.y = SCREEN.height/2 - playerAnim.getHeight()/2;
+		Rectangle slidingRect = new Rectangle(200, 200, 600, 400);
+		int slidingSpeed = 6;
+		slidingComp = new SlidingComponent("PlayerSliding", slidingRect, slidingPos, slidingSpeed);
+		player.addComponent(slidingComp);
+		
+		// Setup the player render component
+		playerRender = new PlayerRenderComponent("PlayerRender", playerAnim);
+		player.addComponent(new PlayerRenderComponent("PlayerRender", playerAnim));
+		
+		// Setup the map render component
+		int scrollSpeed = 6;
+		mapRender = new MapRenderComponent("MapRender", tiledMap, scrollSpeed, slidingComp);
 		map.addComponent(mapRender);
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		player.update(gc, null, delta);
-		mapRender.update(gc, null, delta);
+		map.update(gc, null, delta);
 	}
 
 	@Override

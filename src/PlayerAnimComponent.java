@@ -14,7 +14,7 @@ public class PlayerAnimComponent extends Component {
 		this.player = player;
 		player.stop();
 	}
-
+	
 	@Override
 	public void update(GameContainer gc, StateBasedGame sb, int delta) {
 		Input in = gc.getInput();
